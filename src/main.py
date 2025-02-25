@@ -1,10 +1,10 @@
 import asyncio
-import boto3
 import os
 
 from collections.abc import Callable
 from datetime import datetime
 from dotenv import load_dotenv
+from logger import logger
 from typing import List
 
 from telegram_comm import send_telegram_message
@@ -16,11 +16,12 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-S3_OUTPUT_BUCKET = "s3://aachen-appointment-artifacts"
+OUTPUT_FOLDER = "/home/ec2-user/code/output_artifacts"
 START_PAGE = "https://termine.staedteregion-aachen.de/auslaenderamt/select2?md=1"
 APPOINTMENT_NOT_AVAILABLE_TEXT = "Kein freier Termin verfügbar - test"
 APPOINTMENTS_AVAILABLE_TEXT = "APPOINTMENTS ARE AVAILABLE!"
 TELEGRAM_MESSAGE = f"{APPOINTMENTS_AVAILABLE_TEXT}! Go to link : {START_PAGE}"
+
 
 def setup_driver():
     # Set up Chrome driver
@@ -95,10 +96,10 @@ def find_free_appointment(driver: WebDriver):
 
     try:
         driver.find_element(By.XPATH, f"//*[text()='{APPOINTMENT_NOT_AVAILABLE_TEXT}']")
-        print("No appointment available -- exiting")
+        logger.info("No appointment available -- exiting")
         return
     except NoSuchElementException:
-        print(APPOINTMENTS_AVAILABLE_TEXT)
+        logger.info(APPOINTMENTS_AVAILABLE_TEXT)
         asyncio.run(send_telegram_message(TELEGRAM_MESSAGE))
         save_source_ang_image(driver)
 
@@ -124,31 +125,25 @@ def wait_until(
                     (criteria, path))
             ).click()
     except Exception as e:
-        print(f"Error during the step: {step_title}")
+        logger.info(f"Error during the step: {step_title}")
         raise e
 
 
 def save_source_ang_image(driver: WebDriver):
-    _PAGE_OUTPUT_PATH = "aachen-termin"
-    tmp_local_path = f"/tmp/{_PAGE_OUTPUT_PATH}"
-
+    out_path = f"{OUTPUT_FOLDER}/aachen-termin"
     html_content = driver.page_source
 
-    if not os.path.exists(tmp_local_path):
-        os.makedirs(tmp_local_path, exist_ok=True)
+    if not os.path.exists(out_path):
+        os.makedirs(out_path, exist_ok=True)
 
     now_str = datetime.now().strftime("%Y-%m-%d_%H:%M")
-    output_html = tmp_local_path + "/" + now_str + ".html"
-    output_png = tmp_local_path + "/" + now_str + ".png"
-
-    s3 = boto3.resource('s3')
-    s3.Bucket(S3_OUTPUT_BUCKET).upload_file(output_html, output_html.replace("/tmp/", ""))
-    s3.Bucket(S3_OUTPUT_BUCKET).upload_file(output_png, output_png.replace("/tmp/", ""))
+    output_html = out_path + "/" + now_str + ".html"
+    output_png = out_path + "/" + now_str + ".png"
 
     with open(output_html, "w", encoding="utf-8") as file:
         file.write(html_content)
     driver.save_screenshot(output_png)
-    print(f"HTML content saved to {output_html}, screenshot saved to {output_png}")
+    logger.info(f"HTML content saved to {output_html}, screenshot saved to {output_png}")
 
 
 def main():
@@ -158,12 +153,15 @@ def main():
 
     driver = setup_driver()
     try:
+        print("\n\n" + "--"*50 + "\n")
+        logger.info("Executing new run now")
         find_free_appointment(driver)
     except Exception as e:
-        print(f"Error received during the execution of program: {e}")
+        logger.info(f"Error received during the execution of program: {e}")
         save_source_ang_image(driver)
     finally:
         driver.close()
+        logger.info("Exiting the run")
 
 if __name__ == "__main__":
     main()

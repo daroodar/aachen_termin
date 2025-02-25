@@ -1,8 +1,11 @@
 bin
 lib
+*.pem
 pyvenv.cfg
 .idea
 .vscode
 offline_assets
 .env
 *pycache*
+credentials
+deployment
