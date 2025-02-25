@@ -44,4 +44,4 @@ def setup_logger(log_file_path="application.log", log_level=logging.INFO):
     return logger
 
 
-logger = setup_logger(os.getenv("LOG_FILE_PATH"))
+logger = setup_logger(log_file_path=os.getenv("LOG_FILE_PATH"))

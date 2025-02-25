@@ -16,9 +16,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-OUTPUT_FOLDER = "/home/ec2-user/code/output_artifacts"
+OUTPUT_FOLDER = "/home/ec2-user/code/aachen-termin/output"
 START_PAGE = "https://termine.staedteregion-aachen.de/auslaenderamt/select2?md=1"
-APPOINTMENT_NOT_AVAILABLE_TEXT = "Kein freier Termin verfügbar - test"
+APPOINTMENT_NOT_AVAILABLE_TEXT = "Kein freier Termin verfügbar"
 APPOINTMENTS_AVAILABLE_TEXT = "APPOINTMENTS ARE AVAILABLE!"
 TELEGRAM_MESSAGE = f"{APPOINTMENTS_AVAILABLE_TEXT}! Go to link : {START_PAGE}"
 
@@ -153,7 +153,7 @@ def main():
 
     driver = setup_driver()
     try:
-        print("\n\n" + "--"*50 + "\n")
+        logger.info("\n\n" + "--"*50 + "\n")
         logger.info("Executing new run now")
         find_free_appointment(driver)
     except Exception as e:
