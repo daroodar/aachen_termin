@@ -1,0 +1,8 @@
+bin
+lib
+pyvenv.cfg
+.idea
+.vscode
+offline_assets
+.env
+*pycache*
