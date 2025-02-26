@@ -115,8 +115,7 @@ def find_free_appointment(driver: WebDriver):
             asyncio.run(send_telegram_message(TELEGRAM_MESSAGE))
         else:
             logger.info("Found new appointments but they are within the last hour, ignoring.")
-        save_source_ang_image(driver)
-
+            save_source_ang_image(driver)
 
 def wait_until(
         driver,
