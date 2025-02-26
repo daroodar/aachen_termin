@@ -19,8 +19,9 @@ from selenium.webdriver.support import expected_conditions as EC
 OUTPUT_FOLDER = "/home/ec2-user/code/aachen-termin/output"
 START_PAGE = "https://termine.staedteregion-aachen.de/auslaenderamt/select2?md=1"
 APPOINTMENT_NOT_AVAILABLE_TEXT = "Kein freier Termin verfügbar"
-APPOINTMENTS_AVAILABLE_TEXT = "APPOINTMENTS ARE AVAILABLE!"
-TELEGRAM_MESSAGE = f"{APPOINTMENTS_AVAILABLE_TEXT}! Go to link : {START_PAGE}"
+APPOINTMENTS_AVAILABLE_TEXT = "Appointments are available"
+TELEGRAM_MESSAGE = (f"{APPOINTMENTS_AVAILABLE_TEXT} for Verpflichtungserklärung! Go to link : {START_PAGE} for "
+                    f"booking the appointment")
 
 
 def setup_driver():
@@ -147,6 +148,10 @@ def save_source_ang_image(driver: WebDriver):
 
 
 def main():
+    """
+    Your helpful bot for scraping for appointments in Aachen. Only works for Verpflichtungserklärung
+    appointments for now
+    """
 
     # Load environment variables from .env file
     load_dotenv()
