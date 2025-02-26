@@ -3,6 +3,7 @@ import os
 from logging.handlers import RotatingFileHandler
 import sys
 
+
 def setup_logger(log_file_path="application.log", log_level=logging.INFO):
     """
     Set up logger to write to both file and terminal in append mode
@@ -22,14 +23,16 @@ def setup_logger(log_file_path="application.log", log_level=logging.INFO):
     logger.handlers = []
 
     # Create formatter
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    formatter = logging.Formatter(
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
 
     # Setup file handler (in append mode by default)
     file_handler = RotatingFileHandler(
         log_file_path,
         maxBytes=10 * 1024 * 1024,  # 10MB max file size
         backupCount=5,  # Keep 5 backup copies
-        encoding='utf-8'
+        encoding="utf-8",
     )
     file_handler.setFormatter(formatter)
 
