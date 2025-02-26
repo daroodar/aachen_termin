@@ -1,8 +1,8 @@
 import asyncio
 import os
 
-from dotenv import load_dotenv
 import telegram
+from dotenv import load_dotenv
 
 
 async def send_telegram_message(text: str):

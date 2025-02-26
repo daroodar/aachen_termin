@@ -1,20 +1,20 @@
 import asyncio
 import os
-
 from collections.abc import Callable
 from datetime import datetime
-from dotenv import load_dotenv
-from logger import logger
 from typing import List
 
-from telegram_comm import send_telegram_message
-
+from dotenv import load_dotenv
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
-from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+
+from logger import logger
+from status_checker import check_success_in_last_hour
+from telegram_comm import send_telegram_message
 
 OUTPUT_FOLDER = "/home/ec2-user/code/aachen-termin/output"
 START_PAGE = "https://termine.staedteregion-aachen.de/auslaenderamt/select2?md=1"
@@ -106,23 +106,31 @@ def find_free_appointment(driver: WebDriver):
         return
     except NoSuchElementException:
         logger.info(APPOINTMENTS_AVAILABLE_TEXT)
-        asyncio.run(send_telegram_message(TELEGRAM_MESSAGE))
+
+        updated_in_last_hour = check_success_in_last_hour(
+            time_to_check=3600,
+            status_file=os.path.join(OUTPUT_FOLDER, "status.txt")
+        )
+        if not updated_in_last_hour:
+            asyncio.run(send_telegram_message(TELEGRAM_MESSAGE))
+        else:
+            logger.info("Found new appointments but they are within the last hour, ignoring.")
         save_source_ang_image(driver)
 
 
 def wait_until(
-    driver,
-    criteria: str,
-    paths: List[str],
-    step_title: str,
-    wait_method: Callable = EC.visibility_of_element_located,
-    timeout=10,
-    should_click=True,
+        driver,
+        criteria: str,
+        paths: List[str],
+        step_title: str,
+        wait_method: Callable = EC.visibility_of_element_located,
+        timeout=10,
+        should_click=True,
 ):
     try:
         if not should_click:
             assert (
-                len(paths) == 1
+                    len(paths) == 1
             ), "If the element is not to be clicked, only 1 path allowed"
             return WebDriverWait(driver, timeout).until(
                 wait_method((criteria, paths[0]))
