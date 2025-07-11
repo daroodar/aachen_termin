@@ -9,3 +9,5 @@ offline_assets
 *pycache*
 credentials
 deployment
+logs
+output

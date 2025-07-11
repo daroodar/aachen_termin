@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/bash
 cd /home/ec2-user/code/aachen-termin
 mkdir -p output
 python3 -m venv .venv

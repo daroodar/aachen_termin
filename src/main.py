@@ -25,7 +25,6 @@ TELEGRAM_MESSAGE = (
     f"booking the appointment"
 )
 
-
 def setup_driver():
     # Set up Chrome driver
     options = webdriver.ChromeOptions()
@@ -86,9 +85,9 @@ def find_free_appointment(driver: WebDriver):
     wait_until(
         driver,
         By.XPATH,
-        ["/html/body/main/div/details[2]/div/form/input[4]"],
+        ["/html/body/main/div/div[4]/form/input[5]"],
         wait_method=EC.element_to_be_clickable,
-        step_title="Select Auslanderamt aachen office",
+        step_title="Select Weiter button",
     )
 
     wait_until(
